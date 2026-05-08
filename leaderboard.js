@@ -1,6 +1,6 @@
 // Firebase Configuration
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getDatabase, ref, set, get, query, orderByChild, limitToFirst } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+import { getDatabase, ref, set, get, query, orderByChild, equalTo, onValue } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBi7aOAg8CJXmaCPYLGxQsFp1IXNlBLGqQ",
@@ -49,8 +49,8 @@ class FirebaseLeaderboardManager {
    */
   getTodayDate() {
     const d = new Date();
-    // Trả về định dạng YYYY-MM-DD theo giờ địa phương
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    // Trả về định dạng YYYY-MM-DD theo giờ UTC (Reset lúc 00:00 UTC)
+    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
   }
 
   /**
@@ -62,11 +62,11 @@ class FirebaseLeaderboardManager {
       return false;
     }
 
+    // Giới hạn tên tối đa 30 ký tự
+    const limitedName = playerName.substring(0, 30);
     const today = this.getTodayDate();
-    // Loại bỏ ký tự đặc biệt mà Firebase cấm ( . $ # [ ] )
-    const sanitizedName = playerName.toLowerCase().replace(/[\.\$\#\[\]\s+]/g, '_');
+    const sanitizedName = limitedName.toLowerCase().replace(/[\.\$\#\[\]\s+]/g, '_');
     const scoreKey = `${today}_${sanitizedName}`;
-
     try {
       if (!this.isOnline) {
         // Save to local storage if offline
@@ -88,7 +88,7 @@ class FirebaseLeaderboardManager {
 
       if (shouldUpdate) {
         await set(scoreRef, {
-          name: playerName,
+          name: limitedName,
           score: score,
           date: today,
           timestamp: Date.now()
@@ -115,22 +115,15 @@ class FirebaseLeaderboardManager {
         return this.getFromLocalStorage(today);
       }
 
+      // Sử dụng query để chỉ lấy dữ liệu của ngày hôm nay từ server
       const leaderboardRef = ref(database, 'leaderboard');
-      const snapshot = await get(leaderboardRef);
+      const todayQuery = query(leaderboardRef, orderByChild('date'), equalTo(today));
+      const snapshot = await get(todayQuery);
 
       if (!snapshot.exists()) {
         return [];
       }
-
-      const data = snapshot.val();
-      const todayScores = [];
-
-      // Filter today's scores
-      for (const key in data) {
-        if (data[key].date === today) {
-          todayScores.push(data[key]);
-        }
-      }
+      const todayScores = Object.values(snapshot.val());
 
       // Sort by score descending, then by timestamp ascending
       todayScores.sort((a, b) => {
@@ -240,32 +233,25 @@ class FirebaseLeaderboardManager {
    */
   onLeaderboardUpdate(callback) {
     const leaderboardRef = ref(database, 'leaderboard');
+    const today = this.getTodayDate();
+    const todayQuery = query(leaderboardRef, orderByChild('date'), equalTo(today));
     
     try {
-      // Initial load
-      get(leaderboardRef).then(snapshot => {
+      onValue(todayQuery, (snapshot) => {
         if (snapshot.exists()) {
-          const today = this.getTodayDate();
-          const data = snapshot.val();
-          const todayScores = [];
-
-          for (const key in data) {
-            if (data[key].date === today) {
-              todayScores.push(data[key]);
-            }
-          }
-
-          todayScores.sort((a, b) => {
-            if (b.score !== a.score) {
-              return b.score - a.score;
-            }
+          const data = Object.values(snapshot.val());
+          
+          data.sort((a, b) => {
+            if (b.score !== a.score) return b.score - a.score;
             return a.timestamp - b.timestamp;
           });
 
-          callback(todayScores.slice(0, 10).map((entry, index) => ({
+          const top10 = data.slice(0, 10).map((entry, index) => ({
             ...entry,
             rank: index + 1
-          })));
+          }));
+        
+          callback(top10);
         }
       });
     } catch (error) {

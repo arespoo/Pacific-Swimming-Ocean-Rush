@@ -53,7 +53,7 @@ class LeaderboardUI {
         class="player-name-input" 
         id="playerNameInput" 
         placeholder="Enter your name" 
-        maxlength="20"
+        maxlength="30"
         autocomplete="off"
       >
       
