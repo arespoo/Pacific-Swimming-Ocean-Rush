@@ -72,11 +72,11 @@ class LeaderboardUI {
     // Populate dolphin selection
     const selectionGrid = panel.querySelector('#dolphinSelect');
     selectionGrid.innerHTML = '';
-    dolphinOptions.forEach((option, index) => {
+    window.dolphinOptions.forEach((option, index) => {
       const cell = document.createElement('button');
       cell.type = 'button';
       cell.className = 'selection-cell';
-      if (index === selectedDolphin) cell.classList.add('active');
+      if (index === window.selectedDolphin) cell.classList.add('active');
       cell.innerHTML = `
         <div class="selection-thumb">
           <img src="${option.normal}" alt="${option.name}">
@@ -84,7 +84,7 @@ class LeaderboardUI {
         <div class="selection-name">${option.name}</div>
       `;
       cell.addEventListener('click', () => {
-        selectedDolphin = index;
+        window.selectedDolphin = index;
         saveSelectedDolphin(index);
         panel.querySelectorAll('.selection-cell').forEach((c, i) => {
           c.classList.toggle('active', i === index);
@@ -197,7 +197,7 @@ class LeaderboardUI {
         top10.forEach(entry => {
           const medal = this.getMedalEmoji(entry.rank);
           const nameEscaped = this.escapeHtml(entry.name);
-          const isCurrentPlayer = entry.name.toLowerCase() === this.currentPlayerName.toLowerCase();
+          const isCurrentPlayer = this.currentPlayerName && entry.name.toLowerCase() === this.currentPlayerName.toLowerCase();
           const highlightClass = isCurrentPlayer ? 'highlight' : '';
           
           leaderboardHtml += `

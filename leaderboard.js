@@ -48,8 +48,9 @@ class FirebaseLeaderboardManager {
    * Get today's date string
    */
   getTodayDate() {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
+    const d = new Date();
+    // Trả về định dạng YYYY-MM-DD theo giờ địa phương
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }
 
   /**
@@ -62,7 +63,9 @@ class FirebaseLeaderboardManager {
     }
 
     const today = this.getTodayDate();
-    const scoreKey = `${today}_${playerName.toLowerCase().replace(/\s+/g, '_')}`;
+    // Loại bỏ ký tự đặc biệt mà Firebase cấm ( . $ # [ ] )
+    const sanitizedName = playerName.toLowerCase().replace(/[\.\$\#\[\]\s+]/g, '_');
+    const scoreKey = `${today}_${sanitizedName}`;
 
     try {
       if (!this.isOnline) {
