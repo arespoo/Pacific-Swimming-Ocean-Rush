@@ -76,7 +76,8 @@ soundToggle.classList.toggle('muted', !soundEnabled);
 soundToggle.addEventListener('click', toggleSound);
 
 
-const dolphinOptions = [
+// Make dolphinOptions global so leaderboard-ui.js can access it safely
+window.dolphinOptions = [
   {
     name: "Spike",
     normal: "./assets/dolphin1.jpg",
@@ -140,7 +141,8 @@ obstacleNames.forEach(name => {
 const goldImage = new Image();
 goldImage.src = "./assets/gold.png";
 
-let selectedDolphin = 0;
+// Make selectedDolphin global so leaderboard-ui.js can access and modify it
+window.selectedDolphin = 0;
 let width = 0;
 let height = 0;
 let dpr = window.devicePixelRatio || 1;
@@ -169,7 +171,7 @@ function loadPreferences() {
 
   const savedDolphin = Number(localStorage.getItem('selectedDolphin'));
   if (!Number.isNaN(savedDolphin) && Number.isInteger(savedDolphin) && savedDolphin >= 0 && savedDolphin < dolphinOptions.length) {
-    selectedDolphin = savedDolphin;
+    window.selectedDolphin = savedDolphin;
   }
 }
 
@@ -267,7 +269,7 @@ function swim() {
 function setSelectedDolphin(index) {
   const selectionGrid = document.getElementById("dolphinSelect");
   const selectionHint = document.getElementById("selectionHint");
-  selectedDolphin = index;
+  window.selectedDolphin = index;
   saveSelectedDolphin(index);
 
   const cells = selectionGrid.querySelectorAll(".selection-cell");
@@ -441,7 +443,7 @@ function drawDolphin() {
   const y = dolphin.y;
   const w = dolphin.width;
   const h = dolphin.height;
-  const images = dolphinImages[selectedDolphin];
+  const images = dolphinImages[window.selectedDolphin];
   const image = images[dolphin.state] || images.glide;
   ctx.save();
   ctx.translate(x + w * 0.5, y + h * 0.5);
