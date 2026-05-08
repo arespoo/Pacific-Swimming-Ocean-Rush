@@ -98,6 +98,16 @@ canvas {
   min-width: 80px;
 }
 
+#playerNameDisplay {
+  background: rgba(47, 215, 255, 0.1) !important;
+  border: 1px solid rgba(47, 215, 255, 0.3) !important;
+}
+
+#playerNameDisplay span {
+  color: #2fd7ff;
+  font-weight: 700;
+}
+
 #overlay {
   position: absolute;
   inset: 0;
@@ -112,6 +122,7 @@ canvas {
   opacity: 1;
   transition: opacity 0.25s ease;
   pointer-events: auto;
+  overflow-y: auto;
 }
 
 #overlay.hidden {
@@ -135,10 +146,201 @@ canvas {
   letter-spacing: -0.04em;
 }
 
+#overlay h3 {
+  margin: 18px 0 14px;
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+}
+
 #overlay p {
   margin: 0 0 20px;
   line-height: 1.6;
   color: #d9ebff;
+}
+
+/* Player Name Input */
+.player-name-input {
+  width: 100%;
+  padding: 14px 16px;
+  margin: 16px 0;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  color: #eaf6ff;
+  font-size: 1rem;
+  font-family: Inter, Arial, sans-serif;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.player-name-input::placeholder {
+  color: rgba(234, 246, 255, 0.5);
+}
+
+.player-name-input:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(47, 215, 255, 0.5);
+  box-shadow: 0 0 12px rgba(47, 215, 255, 0.2);
+}
+
+/* Leaderboard Mini Display */
+.leaderboard-mini {
+  margin: 20px 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.mini-leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mini-leaderboard-entry {
+  display: grid;
+  grid-template-columns: 40px 1fr 60px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+.mini-leaderboard-entry .medal {
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+.mini-leaderboard-entry .name {
+  color: #d9ebff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini-leaderboard-entry .score {
+  text-align: right;
+  color: #2fd7ff;
+  font-weight: 700;
+}
+
+/* Game Over Leaderboard */
+.game-over-leaderboard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+  margin: 16px 0;
+  padding: 8px 0;
+}
+
+.leaderboard-row {
+  display: grid;
+  grid-template-columns: 50px 1fr 80px;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.leaderboard-row.highlight {
+  background: rgba(47, 215, 255, 0.15);
+  border-color: rgba(47, 215, 255, 0.4);
+  box-shadow: 0 0 12px rgba(47, 215, 255, 0.15);
+}
+
+.leaderboard-row .medal {
+  text-align: center;
+  font-size: 1.3rem;
+}
+
+.leaderboard-row .name {
+  color: #d9ebff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.leaderboard-row .score {
+  text-align: right;
+  color: #2fd7ff;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.empty-leaderboard {
+  padding: 20px;
+  color: #a8d0ff;
+  font-style: italic;
+}
+
+.rank-message {
+  padding: 12px 16px;
+  margin: 12px 0;
+  background: rgba(47, 215, 255, 0.1);
+  border: 1px solid rgba(47, 215, 255, 0.3);
+  border-radius: 12px;
+  color: #2fd7ff;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.final-score {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2fd7ff;
+  margin: 16px 0;
+}
+
+/* Button Groups */
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.primary-btn,
+.secondary-btn {
+  cursor: pointer;
+  border: none;
+  border-radius: 999px;
+  padding: 14px 22px;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: transform 0.16s ease, background-color 0.16s ease;
+  width: 100%;
+}
+
+.primary-btn {
+  background: #2fd7ff;
+  color: #04334b;
+}
+
+.primary-btn:hover,
+.primary-btn:focus {
+  transform: translateY(-1px);
+  background: #1dccff;
+}
+
+.secondary-btn {
+  background: rgba(47, 215, 255, 0.2);
+  color: #2fd7ff;
+  border: 1px solid rgba(47, 215, 255, 0.4);
+}
+
+.secondary-btn:hover,
+.secondary-btn:focus {
+  background: rgba(47, 215, 255, 0.3);
+  border-color: rgba(47, 215, 255, 0.6);
 }
 
 .selection-grid {
@@ -158,6 +360,7 @@ canvas {
   background: rgba(255, 255, 255, 0.05);
   transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
   padding: 0;
+  cursor: pointer;
 }
 
 .selection-thumb {
@@ -258,6 +461,25 @@ button:focus {
   border-color: rgba(255, 100, 100, 0.55);
 }
 
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(47, 215, 255, 0.3);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(47, 215, 255, 0.5);
+}
+
 @media (max-width: 760px) {
   body {
     padding: 10px;
@@ -296,8 +518,30 @@ button:focus {
     width: 100%;
   }
 
+  .button-group {
+    flex-direction: column;
+  }
+
+  .primary-btn,
+  .secondary-btn {
+    width: 100%;
+  }
+
   #footer {
     font-size: 0.7rem;
     margin-top: 3px;
+  }
+
+  .selection-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .mini-leaderboard-entry,
+  .leaderboard-row {
+    font-size: 0.85rem;
+  }
+
+  .final-score {
+    font-size: 1.5rem;
   }
 }

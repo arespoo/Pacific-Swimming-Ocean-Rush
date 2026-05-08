@@ -23,11 +23,15 @@
       </div>
       <div id="overlay" class="visible">
         <div class="panel">
-          <h2>Choose Your Dolphin</h2>
-          <p>Pick one of the dolphins below, then start the race. The dolphin you choose becomes your 2D runner in-game.</p>
-          <div id="dolphinSelect" class="selection-grid" aria-label="Dolphin selection"></div>
-          <p id="selectionHint">Tap an image to choose your dolphin.</p>
-          <button id="startButton">Start</button>
+          <h2>Ocean Rush</h2>
+          <div id="dolphinSelect" class="selection-grid">
+            <!-- Dolphins will be injected here -->
+          </div>
+          <p id="selectionHint">Select your dolphin!</p>
+          <div class="actions">
+            <button id="startButton">Start Race</button>
+          </div>
+          <div id="leaderboardContainer"></div>
         </div>
       </div>
     </div>
@@ -35,6 +39,14 @@
   <div id="footer">
     <span>Made by @Khoa_TwT</span>
   </div>
-  <script src="main.js"></script>
+
+  <!-- Firebase Configuration & Leaderboard Manager -->
+  <script type="module" src="leaderboard.js"></script>
+  
+  <!-- Leaderboard UI Manager -->
+  <script src="leaderboard-ui.js" defer></script>
+  
+  <!-- Main Game Logic -->
+  <script src="main.js" defer></script>
 </body>
 </html>

@@ -4,9 +4,6 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const overlay = document.getElementById("overlay");
 const wrapper = document.getElementById("gameWrapper");
-const startButton = document.getElementById("startButton");
-const selectionGrid = document.getElementById("dolphinSelect");
-const selectionHint = document.getElementById("selectionHint");
 const scoreEl = document.getElementById("score");
 const bestScoreEl = document.getElementById("bestScore");
 const hintEl = document.getElementById("hint");
@@ -268,6 +265,8 @@ function swim() {
 }
 
 function setSelectedDolphin(index) {
+  const selectionGrid = document.getElementById("dolphinSelect");
+  const selectionHint = document.getElementById("selectionHint");
   selectedDolphin = index;
   saveSelectedDolphin(index);
 
@@ -279,6 +278,7 @@ function setSelectedDolphin(index) {
 }
 
 function createSelectionUI() {
+  const selectionGrid = document.getElementById("dolphinSelect");
   dolphinOptions.forEach((option, index) => {
     const cell = document.createElement("button");
     cell.type = "button";
@@ -312,8 +312,12 @@ function resetGame() {
   dolphin.dashTimer = 0;
   dolphin.state = 'glide';
   dolphin.flapTimer = 0;
-  startButton.disabled = false;
+
+  const startBtn = document.getElementById('startButton');
+  if (startBtn) startBtn.disabled = false;
+
   overlay.classList.add("hidden");
+  leaderboardUI.hidePlayerNameDisplay();
   updateUI();
 }
 
@@ -322,21 +326,31 @@ function startGame() {
   gameState.waiting = true;
   gameState.countdown = 3;
   gameState.countdownTimer = 0;
-  startButton.disabled = true;
-  selectionGrid.querySelectorAll(".selection-cell").forEach(cell => cell.disabled = true);
+
+  const startBtn = document.getElementById('startButton');
+  if (startBtn) startBtn.disabled = true;
+
+  const selectionGrid = document.getElementById('dolphinSelect');
+  if (selectionGrid) {
+    selectionGrid.querySelectorAll(".selection-cell").forEach(cell => cell.disabled = true);
+  }
+
   overlay.classList.add("hidden");
 }
 
-function endGame() {
+async function endGame() {
   gameState.over = true;
   gameState.playing = false;
   dolphin.state = 'fall';
   sounds.gameOver();
-  overlay.querySelector("h2").textContent = "Game Over";
-  overlay.querySelector("p").textContent = `You scored ${gameState.score} points. Tap to dive again.`;
-  startButton.textContent = "Try Again";
-  selectionGrid.querySelectorAll(".selection-cell").forEach(cell => cell.disabled = false);
-  overlay.classList.remove("hidden");
+  
+  // Update leaderboard with final score (Firebase)
+  const playerName = leaderboardUI.currentPlayerName || 'Anonymous';
+  await leaderboardManager.addScore(playerName, gameState.score);
+  
+  // Show game over screen with leaderboard
+  await leaderboardUI.showGameOverScreen(gameState.score);
+  
   if (gameState.score > gameState.bestScore) {
     gameState.bestScore = gameState.score;
     saveBestScore();
@@ -582,6 +596,8 @@ function gameLoop(timestamp) {
       } else {
         sounds.countdownGo();
         resetGame();
+        // Show player name in HUD after game starts
+        leaderboardUI.updatePlayerNameDisplay(leaderboardUI.currentPlayerName);
       }
     }
   }
@@ -681,13 +697,17 @@ function handleInput(event) {
   swim();
 }
 
+const startButton = document.getElementById("startButton");
 startButton.addEventListener("click", startGame);
 window.addEventListener("keydown", handleInput, { passive: false });
 window.addEventListener("pointerdown", handleInput, { passive: false });
 window.addEventListener("touchstart", handleInput, { passive: false });
 
 loadPreferences();
-createSelectionUI();
+
+// Initialize with leaderboard start game screen (Firebase connected)
+leaderboardUI.showStartGameScreen();
+
 updateUI();
 requestAnimationFrame(timestamp => {
   lastTime = timestamp;
